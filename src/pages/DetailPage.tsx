@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { usePokemonDetail } from '../hooks/usePokemonDetail';
 import TypeBadge from '../components/TypeBadge';
 import StatBar from '../components/StatBar';
-import { getTypeAccent, getTypeGlow } from '../utils/typeColors';
+import { getTypeAccent } from '../utils/typeColors';
 
 export default function DetailPage() {
   const { name = '' } = useParams<{ name: string }>();
@@ -12,92 +12,111 @@ export default function DetailPage() {
 
   if (isError || !data) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4"
-           style={{ background: 'var(--bg-base)' }}>
-        <span className="text-5xl opacity-20">◉</span>
-        <p style={{ color: 'var(--text-muted)' }}>Pokémon not found.</p>
-        <Link to="/" className="text-sm underline transition-colors hover:text-white"
-              style={{ color: 'var(--text-faint)' }}>← Back to Pokédex</Link>
+      <div style={{
+        minHeight: '100vh', background: '#0a0a0f',
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center', gap: 16,
+      }}>
+        <span style={{ fontSize: 48, opacity: 0.15 }}>◉</span>
+        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>
+          Pokémon not found.
+        </p>
+        <Link to="/" style={{ color: 'rgba(255,255,255,0.3)', fontSize: 13 }}>
+          ← Back to Pokédex
+        </Link>
       </div>
     );
   }
 
   const types  = data.types.map(t => t.type.name);
   const accent = getTypeAccent(types);
-  const glow   = getTypeGlow(types);
   const image  =
     data.sprites.other['official-artwork'].front_default ??
     data.sprites.front_default;
   const total  = data.stats.reduce((s, x) => s + x.base_stat, 0);
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
+    <div style={{ minHeight: '100vh', background: '#0a0a0f', color: '#fff' }}>
 
-      {/* ── Hero banner ── */}
-      <div
-        className="relative px-6 pt-8 pb-0 overflow-hidden"
-        style={{ borderBottom: '1px solid var(--border)' }}
-      >
-        {/* Glow background */}
-        <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-64
-                     rounded-full blur-3xl opacity-20 pointer-events-none"
-          style={{ background: accent }}
-        />
+      {/* ── Hero ── */}
+      <div style={{
+        position: 'relative', overflow: 'hidden',
+        padding: '40px 24px 0',
+        borderBottom: '1px solid rgba(255,255,255,0.07)',
+      }}>
+        {/* Background glow */}
+        <div style={{
+          position: 'absolute', top: -60, left: '50%',
+          transform: 'translateX(-50%)',
+          width: 400, height: 300, borderRadius: '50%',
+          background: accent,
+          filter: 'blur(80px)', opacity: 0.15,
+          pointerEvents: 'none',
+        }} />
 
-        <div className="max-w-3xl mx-auto relative">
+        <div style={{ maxWidth: 768, margin: '0 auto', position: 'relative' }}>
           {/* Back */}
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 text-sm mb-6
-                       transition-colors hover:text-white"
-            style={{ color: 'var(--text-muted)' }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="m15 18-6-6 6-6"/>
-            </svg>
-            Pokédex
+          <Link to="/" style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            fontSize: 13, color: 'rgba(255,255,255,0.4)',
+            textDecoration: 'none', marginBottom: 32,
+          }}>
+            ← Pokédex
           </Link>
 
-          <div className="flex flex-col sm:flex-row items-center gap-8 pb-10">
+          <div style={{
+            display: 'flex', flexWrap: 'wrap',
+            alignItems: 'center', gap: 40, paddingBottom: 40,
+          }}>
             {/* Image */}
-            <div className="relative shrink-0">
-              <div
-                className="absolute inset-0 rounded-full blur-2xl opacity-40"
-                style={{ background: accent }}
-              />
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <div style={{
+                position: 'absolute', inset: -16,
+                borderRadius: '50%',
+                background: accent,
+                filter: 'blur(32px)', opacity: 0.3,
+              }} />
               <img
                 src={image}
                 alt={data.name}
-                className="relative w-44 h-44 object-contain drop-shadow-2xl"
+                style={{
+                  position: 'relative',
+                  width: 176, height: 176,
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.5))',
+                }}
               />
             </div>
 
             {/* Info */}
-            <div className="flex flex-col gap-3 text-center sm:text-left">
-              <span className="text-sm font-semibold"
-                    style={{ color: accent }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <span style={{
+                fontSize: 13, fontWeight: 700,
+                color: accent, letterSpacing: 1,
+              }}>
                 #{String(data.id).padStart(4, '0')}
               </span>
-              <h1 className="text-4xl font-bold capitalize tracking-tight">
+              <h1 style={{
+                fontSize: 40, fontWeight: 700, margin: 0,
+                textTransform: 'capitalize', letterSpacing: -1,
+              }}>
                 {data.name}
               </h1>
-              <div className="flex gap-2 justify-center sm:justify-start">
-                {types.map(t => (
-                  <TypeBadge key={t} type={t} size="md" />
-                ))}
+              <div style={{ display: 'flex', gap: 8 }}>
+                {types.map(t => <TypeBadge key={t} type={t} size="md" />)}
               </div>
-              {/* Physical */}
-              <div className="flex gap-6 justify-center sm:justify-start mt-1">
+              <div style={{ display: 'flex', gap: 32, marginTop: 4 }}>
                 {[
                   { label: 'Height', value: `${(data.height / 10).toFixed(1)} m` },
                   { label: 'Weight', value: `${(data.weight / 10).toFixed(1)} kg` },
                 ].map(({ label, value }) => (
-                  <div key={label} className="flex flex-col gap-0.5">
-                    <span className="text-[10px] uppercase tracking-widest font-semibold"
-                          style={{ color: 'var(--text-faint)' }}>{label}</span>
-                    <span className="text-sm font-semibold">{value}</span>
+                  <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <span style={{
+                      fontSize: 10, textTransform: 'uppercase',
+                      letterSpacing: 1.5, fontWeight: 600,
+                      color: 'rgba(255,255,255,0.25)',
+                    }}>{label}</span>
+                    <span style={{ fontSize: 15, fontWeight: 600 }}>{value}</span>
                   </div>
                 ))}
               </div>
@@ -107,67 +126,77 @@ export default function DetailPage() {
       </div>
 
       {/* ── Body ── */}
-      <main className="max-w-3xl mx-auto px-6 py-8 flex flex-col gap-8">
+      <main style={{ maxWidth: 768, margin: '0 auto', padding: '40px 24px' }}>
 
-        {/* Stats */}
-        <Section title="Base stats" accent={accent}>
-          <div className="flex flex-col gap-3">
+        <Section title="Base Stats" accent={accent}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {data.stats.map(s => (
-              <StatBar key={s.stat.name} name={s.stat.name} value={s.base_stat} />
+              <StatBar key={s.stat.name} name={s.stat.name} value={s.base_stat} accent={accent} />
             ))}
-            <div className="flex items-center gap-3 pt-3"
-                 style={{ borderTop: '1px solid var(--border)' }}>
-              <span className="w-16 text-[10px] text-right uppercase tracking-widest font-semibold shrink-0"
-                    style={{ color: 'var(--text-faint)' }}>Total</span>
-              <span className="text-base font-bold" style={{ color: accent }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 12,
+              paddingTop: 12,
+              borderTop: '1px solid rgba(255,255,255,0.07)',
+            }}>
+              <span style={{
+                width: 56, textAlign: 'right', fontSize: 10,
+                textTransform: 'uppercase', letterSpacing: 1.5,
+                fontWeight: 600, color: 'rgba(255,255,255,0.25)', flexShrink: 0,
+              }}>Total</span>
+              <span style={{ fontSize: 18, fontWeight: 700, color: accent }}>
                 {total}
               </span>
             </div>
           </div>
         </Section>
 
-        {/* Abilities */}
         <Section title="Abilities" accent={accent}>
-          <div className="flex flex-wrap gap-3">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
             {data.abilities.map(({ ability, is_hidden }) => (
-              <div
-                key={ability.name}
-                className="px-4 py-2.5 rounded-xl flex flex-col gap-0.5"
-                style={{ background: 'var(--bg-card)',
-                         border: '1px solid var(--border)' }}
-              >
-                <span className="text-sm font-semibold capitalize">
+              <div key={ability.name} style={{
+                padding: '10px 16px', borderRadius: 12,
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.07)',
+                display: 'flex', flexDirection: 'column', gap: 2,
+              }}>
+                <span style={{
+                  fontSize: 13, fontWeight: 600, textTransform: 'capitalize',
+                }}>
                   {ability.name.replace('-', ' ')}
                 </span>
                 {is_hidden && (
-                  <span className="text-[10px] uppercase tracking-widest font-semibold"
-                        style={{ color: accent }}>Hidden</span>
+                  <span style={{
+                    fontSize: 10, textTransform: 'uppercase',
+                    letterSpacing: 1.5, fontWeight: 600, color: accent,
+                  }}>Hidden</span>
                 )}
               </div>
             ))}
           </div>
         </Section>
 
-        {/* Sprites */}
         <Section title="Sprites" accent={accent}>
-          <div className="flex flex-wrap gap-4">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
             {[
               { label: 'Default',      src: data.sprites.front_default },
               { label: 'Official art', src: data.sprites.other['official-artwork'].front_default },
-            ]
-              .filter(s => !!s.src)
-              .map(({ label, src }) => (
-                <div
-                  key={label}
-                  className="flex flex-col items-center gap-2 p-4 rounded-xl"
-                  style={{ background: 'var(--bg-card)',
-                           border: '1px solid var(--border)' }}
-                >
-                  <img src={src} alt={label} className="w-20 h-20 object-contain" />
-                  <span className="text-[10px] uppercase tracking-widest font-semibold"
-                        style={{ color: 'var(--text-faint)' }}>{label}</span>
-                </div>
-              ))}
+            ].filter(s => !!s.src).map(({ label, src }) => (
+              <div key={label} style={{
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', gap: 8,
+                padding: 16, borderRadius: 12,
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.07)',
+              }}>
+                <img src={src} alt={label}
+                     style={{ width: 80, height: 80, objectFit: 'contain' }} />
+                <span style={{
+                  fontSize: 10, textTransform: 'uppercase',
+                  letterSpacing: 1.5, fontWeight: 600,
+                  color: 'rgba(255,255,255,0.25)',
+                }}>{label}</span>
+              </div>
+            ))}
           </div>
         </Section>
       </main>
@@ -175,21 +204,24 @@ export default function DetailPage() {
   );
 }
 
-/* ── Helpers ── */
-function Section({
-  title, accent, children,
-}: {
+function Section({ title, accent, children }: {
   title: string; accent: string; children: React.ReactNode;
 }) {
   return (
-    <section className="flex flex-col gap-4">
-      <div className="flex items-center gap-3">
-        <span
-          className="w-1 h-4 rounded-full shrink-0"
-          style={{ background: accent }}
-        />
-        <h2 className="text-xs font-bold uppercase tracking-widest"
-            style={{ color: 'var(--text-faint)' }}>
+    <section style={{ marginBottom: 40 }}>
+      <div style={{
+        display: 'flex', alignItems: 'center',
+        gap: 10, marginBottom: 20,
+      }}>
+        <div style={{
+          width: 3, height: 16, borderRadius: 4,
+          background: accent, flexShrink: 0,
+        }} />
+        <h2 style={{
+          fontSize: 11, fontWeight: 700, margin: 0,
+          textTransform: 'uppercase', letterSpacing: 2,
+          color: 'rgba(255,255,255,0.35)',
+        }}>
           {title}
         </h2>
       </div>
@@ -199,33 +231,36 @@ function Section({
 }
 
 function DetailSkeleton() {
+  const pulse = {
+    background: 'rgba(255,255,255,0.06)',
+    borderRadius: 8,
+    animation: 'pulse 1.5s ease-in-out infinite',
+  } as React.CSSProperties;
+
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
-      <div className="max-w-3xl mx-auto px-6 pt-8">
-        <div className="h-4 w-20 rounded animate-pulse mb-6"
-             style={{ background: 'var(--bg-card)' }} />
-        <div className="flex gap-8 pb-10">
-          <div className="w-44 h-44 rounded-full animate-pulse shrink-0"
-               style={{ background: 'var(--bg-card)' }} />
-          <div className="flex flex-col gap-3 flex-1 pt-4">
-            <div className="h-3 w-12 rounded animate-pulse" style={{ background: 'var(--bg-card)' }} />
-            <div className="h-8 w-48 rounded animate-pulse" style={{ background: 'var(--bg-card)' }} />
-            <div className="flex gap-2">
-              <div className="h-6 w-16 rounded-full animate-pulse" style={{ background: 'var(--bg-card)' }} />
-              <div className="h-6 w-16 rounded-full animate-pulse" style={{ background: 'var(--bg-card)' }} />
+    <div style={{ minHeight: '100vh', background: '#0a0a0f', padding: '40px 24px' }}>
+      <div style={{ maxWidth: 768, margin: '0 auto' }}>
+        <div style={{ ...pulse, width: 80, height: 14, marginBottom: 32 }} />
+        <div style={{ display: 'flex', gap: 40, marginBottom: 40 }}>
+          <div style={{ ...pulse, width: 176, height: 176, borderRadius: '50%', flexShrink: 0 }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, flex: 1, paddingTop: 16 }}>
+            <div style={{ ...pulse, width: 48, height: 12 }} />
+            <div style={{ ...pulse, width: 200, height: 36 }} />
+            <div style={{ display: 'flex', gap: 8 }}>
+              <div style={{ ...pulse, width: 64, height: 24, borderRadius: 20 }} />
+              <div style={{ ...pulse, width: 64, height: 24, borderRadius: 20 }} />
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="flex gap-3">
-              <div className="w-16 h-3 rounded animate-pulse" style={{ background: 'var(--bg-card)' }} />
-              <div className="w-8 h-3 rounded animate-pulse"  style={{ background: 'var(--bg-card)' }} />
-              <div className="flex-1 h-2 rounded animate-pulse" style={{ background: 'var(--bg-card)' }} />
-            </div>
-          ))}
-        </div>
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
+            <div style={{ ...pulse, width: 56, height: 12 }} />
+            <div style={{ ...pulse, width: 32, height: 12 }} />
+            <div style={{ ...pulse, flex: 1, height: 6, borderRadius: 4 }} />
+          </div>
+        ))}
       </div>
+      <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
     </div>
   );
 }
