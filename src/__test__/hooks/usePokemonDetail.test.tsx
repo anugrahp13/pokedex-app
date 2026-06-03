@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { usePokemonDetail } from '../../hooks/usePokemonDetail';
 import * as pokemonService from '../../api/pokemonService';
 import { mockBulbasaur } from '../utils/mockData';
@@ -9,10 +9,16 @@ import { mockBulbasaur } from '../utils/mockData';
 vi.mock('../../api/pokemonService');
 const mockedService = vi.mocked(pokemonService);
 
-// Wrapper minimal untuk renderHook
+// Fix: hapus 'logger' — tidak ada di QueryClientConfig versi terbaru
+// Suppress error logs di test pakai consoleSpy instead
 const createWrapper = () => {
   const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false, gcTime: 0 } },
+    defaultOptions: {
+      queries: {
+        retry: false,
+        gcTime: 0,
+      },
+    },
   });
   return ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
@@ -21,6 +27,8 @@ const createWrapper = () => {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // Suppress console.error dari React Query saat test error case
+  vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
 describe('usePokemonDetail', () => {
@@ -72,7 +80,6 @@ describe('usePokemonDetail', () => {
       { wrapper: createWrapper() }
     );
 
-    // enabled: false → query tidak dijalankan
     expect(result.current.isLoading).toBe(false);
     expect(result.current.fetchStatus).toBe('idle');
     expect(mockedService.fetchPokemonDetail).not.toHaveBeenCalled();
@@ -109,7 +116,6 @@ describe('usePokemonDetail', () => {
 
     renderHook(() => usePokemonDetail('bulbasaur'), { wrapper });
 
-    // Tidak fetch ulang karena staleTime Infinity + cache masih ada
     await waitFor(() =>
       expect(mockedService.fetchPokemonDetail).toHaveBeenCalledTimes(1)
     );

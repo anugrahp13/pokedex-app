@@ -1,9 +1,8 @@
-import { ReactNode } from 'react';
-import { render, RenderOptions } from '@testing-library/react';
+import { type ReactNode } from 'react';
+import { render, type RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 
-// QueryClient khusus test: retry off, no logging
 export const createTestQueryClient = () =>
   new QueryClient({
     defaultOptions: {
@@ -11,11 +10,6 @@ export const createTestQueryClient = () =>
         retry: false,
         gcTime: 0,
       },
-    },
-    logger: {
-      log:   () => {},
-      warn:  () => {},
-      error: () => {},
     },
   });
 
