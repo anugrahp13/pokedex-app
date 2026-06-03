@@ -14,7 +14,6 @@ beforeEach(() => {
 
 describe('PokemonCard', () => {
   it('shows skeleton while loading', () => {
-    // fetchPokemonDetail tidak pernah resolve → loading terus
     mockedService.fetchPokemonDetail.mockReturnValue(new Promise(() => {}));
 
     const { container } = renderWithProviders(<PokemonCard name="bulbasaur" />);

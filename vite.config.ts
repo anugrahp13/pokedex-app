@@ -7,6 +7,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/setupTests.ts'],
+    include: ['src/__tests__/**/*.test.{ts,tsx}'],
     environmentOptions: {
       jsdom: {
         resources: 'usable',
@@ -15,7 +16,11 @@ export default defineConfig({
     coverage: {
       reporter: ['text', 'html'],
       include: ['src/**/*.{ts,tsx}'],
-      exclude: ['src/main.tsx', 'src/**/*.d.ts'],
+      exclude: [
+        'src/main.tsx',
+        'src/**/*.d.ts',
+        'src/__tests__/**',
+      ],
     },
   },
 });
