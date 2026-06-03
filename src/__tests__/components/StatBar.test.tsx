@@ -11,7 +11,8 @@ describe('StatBar', () => {
 
   it('maps raw name to display label', () => {
     render(<StatBar name="special-attack" value={65} />);
-    expect(screen.getByText('SP.ATK')).toBeInTheDocument();
+    // Component renders 'Sp.Atk' (CSS text-transform:uppercase only affects visual, not DOM text)
+    expect(screen.getByText('Sp.Atk')).toBeInTheDocument();
   });
 
   it('renders fallback label for unknown stat', () => {
@@ -21,14 +22,17 @@ describe('StatBar', () => {
 
   it('renders progress bar with correct width', () => {
     const { container } = render(<StatBar name="hp" value={127} max={255} />);
-    const bar = container.querySelector('[style*="width"]') as HTMLElement;
+    // The inner bar div is inside the overflow:hidden container
+    const progressContainer = container.querySelector('[style*="overflow: hidden"]') as HTMLElement;
+    const bar = progressContainer?.firstElementChild as HTMLElement;
     expect(bar.style.width).toBe('50%');
   });
 
   it('caps bar at 100% when value exceeds max', () => {
     const { container } = render(<StatBar name="hp" value={300} max={255} />);
-    const bar = container.querySelector('[style*="width"]') as HTMLElement;
-    // 300/255 = 117% → dikap di 100% oleh CSS overflow-hidden container
-    expect(parseInt(bar.style.width)).toBeGreaterThan(100);
+    // Component uses Math.min(..., 100) so the value is capped at 100%
+    const progressContainer = container.querySelector('[style*="overflow: hidden"]') as HTMLElement;
+    const bar = progressContainer?.firstElementChild as HTMLElement;
+    expect(bar.style.width).toBe('100%');
   });
 });

@@ -8,21 +8,25 @@ describe('TypeBadge', () => {
     expect(screen.getByText('fire')).toBeInTheDocument();
   });
 
-  it('applies fire color class', () => {
+  it('applies fire color style', () => {
     render(<TypeBadge type="fire" />);
     const badge = screen.getByText('fire');
-    expect(badge.className).toContain('bg-orange-400');
+    // Browser converts hex to rgb() format
+    expect(badge.style.color).toBe('rgb(239, 159, 39)');
+    expect(badge.style.background).toContain('rgba(239, 159, 39');
   });
 
-  it('applies water color class', () => {
+  it('applies water color style', () => {
     render(<TypeBadge type="water" />);
     const badge = screen.getByText('water');
-    expect(badge.className).toContain('bg-blue-400');
+    expect(badge.style.color).toBe('rgb(133, 183, 235)');
+    expect(badge.style.background).toContain('rgba(133, 183, 235');
   });
 
-  it('falls back to gray for unknown type', () => {
+  it('falls back to default for unknown type', () => {
     render(<TypeBadge type="unknown-type" />);
     const badge = screen.getByText('unknown-type');
-    expect(badge.className).toContain('bg-gray-300');
+    expect(badge.style.color).toBe('rgb(136, 135, 128)');
+    expect(badge.style.background).toContain('rgba(136, 135, 128');
   });
 });

@@ -18,7 +18,10 @@ describe('PokemonCard', () => {
 
     const { container } = renderWithProviders(<PokemonCard name="bulbasaur" />);
 
-    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
+    // Component uses inline style animation, not a CSS class
+    const skeleton = container.querySelector('[style*="animation"]') as HTMLElement;
+    expect(skeleton).toBeInTheDocument();
+    expect(skeleton.style.animation).toContain('pulse');
   });
 
   it('renders pokemon name after load', async () => {
